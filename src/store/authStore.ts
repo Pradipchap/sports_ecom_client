@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { apiRequest } from "@/lib/api";
+import { useCartStore } from "@/store/cartStore";
 import { User } from "@/types";
 
 type AuthState = {
@@ -49,6 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     await apiRequest<{ message: string }>("/auth/logout", {
       method: "POST",
     });
+    useCartStore.getState().clearCart();
     set({ user: null, initialized: true });
   },
 
@@ -58,6 +60,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = await apiRequest<{ user: User }>("/auth/me");
       set({ user: data.user, initialized: true });
     } catch {
+      useCartStore.getState().clearCart();
       set({ user: null, initialized: true });
     } finally {
       set({ loading: false });

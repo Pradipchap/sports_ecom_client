@@ -11,6 +11,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useProductStore } from "@/store/productStore";
 import { Product } from "@/types";
 import { ProductCard } from "@/components/user/ProductCard";
+import { WishlistButton } from "@/components/user/WishlistButton";
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
@@ -135,6 +136,7 @@ export default function ProductDetailPage() {
           >
             Add to cart
           </button>
+          <WishlistButton productId={product.id} />
         </div>
       </section>
 

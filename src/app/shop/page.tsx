@@ -23,6 +23,7 @@ const initialFilters: FilterState = {
 
 export default function ShopPage() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const [sortBy, setSortBy] = useState("featured");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,25 @@ export default function ShopPage() {
     () => Object.values(filters).filter(Boolean).length,
     [filters]
   );
+
+  const sortedProducts = useMemo(() => {
+    const cloned = [...products];
+
+    switch (sortBy) {
+      case "newest":
+        return cloned.sort(
+          (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+        );
+      case "price-low-high":
+        return cloned.sort((left, right) => left.price - right.price);
+      case "price-high-low":
+        return cloned.sort((left, right) => right.price - left.price);
+      case "stock":
+        return cloned.sort((left, right) => right.stock - left.stock);
+      default:
+        return cloned;
+    }
+  }, [products, sortBy]);
 
   return (
     <section className="space-y-6">
@@ -167,6 +187,17 @@ export default function ShopPage() {
               <p className="text-sm uppercase tracking-[0.24em] text-zinc-400">Results</p>
               <h2 className="text-2xl font-bold tracking-tight text-zinc-950">{products.length} items found</h2>
             </div>
+            <select
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value)}
+              className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700"
+            >
+              <option value="featured">Featured</option>
+              <option value="newest">Newest</option>
+              <option value="price-low-high">Price: Low to High</option>
+              <option value="price-high-low">Price: High to Low</option>
+              <option value="stock">Best stocked</option>
+            </select>
           </div>
 
           {loading ? (
@@ -179,7 +210,7 @@ export default function ShopPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {products.map((product) => (
+              {sortedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

@@ -9,6 +9,7 @@ import { formatCurrencyNPR } from "@/lib/format";
 import { Product } from "@/types";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
+import { WishlistButton } from "@/components/user/WishlistButton";
 
 type Props = {
   product: Product;
@@ -54,9 +55,14 @@ export const ProductCard = ({ product }: Props) => {
           <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-medium text-zinc-700 backdrop-blur">
             {product.category?.name ?? "Featured"}
           </span>
-          <span className="rounded-full bg-zinc-950 px-3 py-1 text-xs font-medium text-white">
-            {formatCurrencyNPR(product.price)}
-          </span>
+          <div className="flex items-center gap-2">
+            {product.stock < 10 && (
+              <span className="rounded-full bg-amber-500 px-3 py-1 text-xs font-medium text-white">
+                Limited
+              </span>
+            )}
+            <WishlistButton productId={product.id} compact />
+          </div>
         </div>
       </div>
       <div className="space-y-4 p-5">
@@ -65,6 +71,10 @@ export const ProductCard = ({ product }: Props) => {
           <p className="text-sm leading-6 text-zinc-600">{product.description}</p>
         </div>
         <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">Price</p>
+            <p className="font-semibold text-zinc-900">{formatCurrencyNPR(product.price)}</p>
+          </div>
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">Sizes</p>
             <p className="font-semibold text-zinc-900">{product.availableSizes.join(", ")}</p>

@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 export const Navbar = () => {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const cart = useCartStore((state) => state.cart);
+  const wishlistCount = useWishlistStore((state) => state.items.length);
 
   const cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
@@ -46,6 +48,12 @@ export const Navbar = () => {
             className="rounded-full border border-zinc-200 bg-white px-4 py-2 font-medium text-zinc-700 transition hover:bg-zinc-50"
           >
             Cart ({cartCount})
+          </Link>
+          <Link
+            href="/wishlist"
+            className="rounded-full border border-zinc-200 bg-white px-4 py-2 font-medium text-zinc-700 transition hover:bg-zinc-50"
+          >
+            Wishlist ({wishlistCount})
           </Link>
           {!user ? (
             <>

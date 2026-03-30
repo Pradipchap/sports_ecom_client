@@ -158,7 +158,7 @@ export default function CheckoutPage() {
             />
           </div>
           <button className="mt-2 w-fit rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white">
-            Place fake order
+            Place  order
           </button>
         </form>
       </div>

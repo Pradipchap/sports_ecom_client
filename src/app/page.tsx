@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import Link from "next/link";
+import { useEffect, useMemo } from "react";
 import { CategoryFilter } from "@/components/user/CategoryFilter";
 import { ProductCard } from "@/components/user/ProductCard";
 import { useProductStore } from "@/store/productStore";
@@ -17,6 +18,15 @@ export default function Home() {
     fetchProducts,
     fetchCategories,
   } = useProductStore();
+
+  const featuredProducts = useMemo(() => products.slice(0, 3), [products]);
+  const latestProducts = useMemo(
+    () =>
+      [...products]
+        .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+        .slice(0, 4),
+    [products]
+  );
 
   useEffect(() => {
     void fetchCategories();
@@ -52,6 +62,20 @@ export default function Home() {
               <span className="rounded-full bg-zinc-100 px-3 py-2">{products.length} products</span>
               <span className="rounded-full bg-zinc-100 px-3 py-2">{categories.length} categories</span>
             </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/shop"
+              className="rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-zinc-950/15"
+            >
+              Explore all products
+            </Link>
+            <Link
+              href="/wishlist"
+              className="rounded-full border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-700"
+            >
+              View wishlist
+            </Link>
           </div>
         </div>
         <div className="rounded-[28px] bg-gradient-to-br from-zinc-950 via-zinc-800 to-amber-700 p-6 text-white">
@@ -97,6 +121,49 @@ export default function Home() {
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
+      )}
+
+      {featuredProducts.length > 0 && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.24em] text-zinc-400">Editor picks</p>
+              <h2 className="mt-1 text-2xl font-bold tracking-tight text-zinc-950">Featured products</h2>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {latestProducts.length > 0 && (
+        <section className="space-y-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.24em] text-zinc-400">Fresh drops</p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-zinc-950">New arrivals</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {latestProducts.map((product) => (
+              <div
+                key={product.id}
+                className="rounded-[28px] border border-white/60 bg-white/90 p-5 shadow-[0_20px_60px_-36px_rgba(15,23,42,0.3)]"
+              >
+                <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">{product.category?.name}</p>
+                <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-950">{product.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-600">{product.description}</p>
+                <Link
+                  href={`/product/${product.id}`}
+                  className="mt-4 inline-flex rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700"
+                >
+                  View details
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
     </section>
   );

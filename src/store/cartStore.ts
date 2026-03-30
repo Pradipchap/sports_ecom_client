@@ -7,6 +7,7 @@ import { Cart } from "@/types";
 type CartState = {
   cart: Cart | null;
   loading: boolean;
+  clearCart: () => void;
   fetchCart: () => Promise<void>;
   addToCart: (productId: string, size: number, quantity?: number) => Promise<void>;
   updateCartItem: (productId: string, size: number, quantity: number) => Promise<void>;
@@ -16,6 +17,9 @@ type CartState = {
 export const useCartStore = create<CartState>((set) => ({
   cart: null,
   loading: false,
+  clearCart() {
+    set({ cart: null });
+  },
 
   async fetchCart() {
     set({ loading: true });
