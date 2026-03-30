@@ -21,7 +21,16 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const message = data?.message ?? "Something went wrong";
+    const validationMessage =
+      Array.isArray(data?.errors) && data.errors.length > 0
+        ? data.errors
+            .map((issue: { message?: string; path?: string[] }) =>
+              issue?.path?.length ? `${issue.path.join(".")}: ${issue.message}` : issue?.message
+            )
+            .filter(Boolean)
+            .join(", ")
+        : "";
+    const message = validationMessage || data?.message || "Something went wrong";
     throw new Error(message);
   }
 

@@ -21,6 +21,14 @@ const initialFilters: FilterState = {
   maxPrice: "",
 };
 
+/** Non-negative price string for inputs; empty stays empty. */
+const sanitizePriceInput = (raw: string): string => {
+  if (raw === "") return "";
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return "";
+  return String(Math.round(n));
+};
+
 export default function ShopPage() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [sortBy, setSortBy] = useState("featured");
@@ -45,9 +53,16 @@ export default function ShopPage() {
 
         if (filters.search) params.set("search", filters.search);
         if (filters.categoryId) params.set("categoryId", filters.categoryId);
+        // No `size` param → API returns products in every size (no size filter)
         if (filters.size) params.set("size", filters.size);
-        if (filters.minPrice) params.set("minPrice", filters.minPrice);
-        if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+        const minP = filters.minPrice ? Number(filters.minPrice) : undefined;
+        const maxP = filters.maxPrice ? Number(filters.maxPrice) : undefined;
+        if (minP !== undefined && Number.isFinite(minP) && minP >= 0) {
+          params.set("minPrice", String(minP));
+        }
+        if (maxP !== undefined && Number.isFinite(maxP) && maxP >= 0) {
+          params.set("maxPrice", String(maxP));
+        }
         params.set("limit", "100");
 
         const query = params.toString() ? `?${params.toString()}` : "";
@@ -92,7 +107,7 @@ export default function ShopPage() {
         <h1 className="text-4xl font-bold tracking-tight text-zinc-950">Filter sports gear your way</h1>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(240px,280px)_minmax(0,1fr)] lg:gap-8">
         <aside className="h-fit space-y-4 rounded-[28px] border border-white/60 bg-white/90 p-5 shadow-[0_24px_80px_-40px_rgba(15,23,42,0.35)]">
           <div className="flex items-center justify-between">
             <div>
@@ -137,6 +152,11 @@ export default function ShopPage() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-700">Size</label>
+            <p className="text-xs text-zinc-500">
+              {filters.size
+                ? `Showing items available in size ${filters.size}.`
+                : "Showing all sizes — tap a number to filter by that size."}
+            </p>
             <div className="grid grid-cols-5 gap-2">
               {Array.from({ length: 10 }, (_, index) => String(index + 1)).map((size) => (
                 <button
@@ -164,8 +184,16 @@ export default function ShopPage() {
               <label className="text-sm font-medium text-zinc-700">Min price (NPR)</label>
               <input
                 type="number"
+                min={0}
+                step={1}
+                inputMode="numeric"
                 value={filters.minPrice}
-                onChange={(event) => setFilters((prev) => ({ ...prev, minPrice: event.target.value }))}
+                onChange={(event) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    minPrice: sanitizePriceInput(event.target.value),
+                  }))
+                }
                 className="w-full rounded-2xl border border-zinc-200 px-4 py-3 shadow-sm outline-none transition focus:border-zinc-400"
               />
             </div>
@@ -173,15 +201,23 @@ export default function ShopPage() {
               <label className="text-sm font-medium text-zinc-700">Max price (NPR)</label>
               <input
                 type="number"
+                min={0}
+                step={1}
+                inputMode="numeric"
                 value={filters.maxPrice}
-                onChange={(event) => setFilters((prev) => ({ ...prev, maxPrice: event.target.value }))}
+                onChange={(event) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    maxPrice: sanitizePriceInput(event.target.value),
+                  }))
+                }
                 className="w-full rounded-2xl border border-zinc-200 px-4 py-3 shadow-sm outline-none transition focus:border-zinc-400"
               />
             </div>
           </div>
         </aside>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <div className="flex items-center justify-between rounded-[28px] border border-white/60 bg-white/85 px-5 py-4">
             <div>
               <p className="text-sm uppercase tracking-[0.24em] text-zinc-400">Results</p>
@@ -209,9 +245,11 @@ export default function ShopPage() {
               No items matched those filters.
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7">
               {sortedProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <div key={product.id} className="min-w-0">
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
           )}

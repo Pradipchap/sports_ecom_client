@@ -2,28 +2,80 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, FieldErrors, Resolver, useForm, useWatch } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resolveImageUrl } from "@/lib/api";
+
+/** Allow empty, http(s) URLs, or server-relative paths like /uploads/... (stored after admin upload). */
+const imageFieldSchema = z
+  .string()
+  .refine(
+    (val) => {
+      if (val === "") return true;
+      if (val.startsWith("/")) return true;
+      try {
+        new URL(val);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: "Enter a valid image URL, leave empty when using upload only, or keep the existing path" }
+  );
 
 const schema = z.object({
   name: z.string().min(2),
   description: z.string().min(10),
   price: z.number().positive(),
-  image: z.string().url().or(z.literal("")),
+  image: imageFieldSchema,
   stock: z.number().int().nonnegative(),
-  availableSizes: z.array(z.number().int().min(1).max(10)).min(1, "Select at least one size"),
+  availableSizes: z
+    .array(z.number().int().min(1).max(10))
+    .min(1, "Select at least one size"),
   categoryId: z.string().min(1),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = {
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  stock: number;
+  availableSizes: number[];
+  categoryId: string;
+};
 
 type Props = {
   defaultValues?: Partial<FormValues>;
   categories: { id: string; name: string }[];
   onSubmit: (values: FormValues, imageFile: File | null) => Promise<void>;
   submitLabel: string;
+};
+
+const normalizeSizeList = (sizes: number[] | undefined): number[] => {
+  if (!sizes?.length) return [6, 7, 8, 9];
+  const unique = [...new Set(sizes.map((n) => Number(n)).filter((n) => Number.isInteger(n) && n >= 1 && n <= 10))];
+  unique.sort((a, b) => a - b);
+  return unique.length > 0 ? unique : [6, 7, 8, 9];
+};
+
+const firstValidationMessage = (formErrors: FieldErrors<FormValues>): string => {
+  const stack: unknown[] = [formErrors];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current || typeof current !== "object") continue;
+    if ("message" in current && typeof (current as { message?: unknown }).message === "string") {
+      return (current as { message: string }).message;
+    }
+    for (const value of Object.values(current)) {
+      if (value && typeof value === "object") {
+        stack.push(value);
+      }
+    }
+  }
+  return "Please fix the highlighted fields.";
 };
 
 export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }: Props) => {
@@ -35,14 +87,14 @@ export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as Resolver<FormValues>,
     defaultValues: {
       name: defaultValues?.name ?? "",
       description: defaultValues?.description ?? "",
       price: defaultValues?.price ?? 0,
       image: defaultValues?.image ?? "",
       stock: defaultValues?.stock ?? 0,
-      availableSizes: defaultValues?.availableSizes ?? [6, 7, 8, 9],
+      availableSizes: normalizeSizeList(defaultValues?.availableSizes),
       categoryId: defaultValues?.categoryId ?? "",
     },
   });
@@ -72,7 +124,15 @@ export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }
         : "");
 
   return (
-    <form onSubmit={handleSubmit((values) => onSubmit(values, imageFile))} className="grid grid-cols-1 gap-5">
+    <form
+      onSubmit={handleSubmit(
+        (values) => onSubmit(values, imageFile),
+        (formErrors) => {
+          toast.error(firstValidationMessage(formErrors));
+        }
+      )}
+      className="grid grid-cols-1 gap-5"
+    >
       <div>
         <label className="mb-1 block text-sm font-medium text-zinc-700">Name</label>
         <input
@@ -153,22 +213,39 @@ export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }
       </div>
       <div>
         <label className="mb-2 block text-sm font-medium text-zinc-700">Available sizes</label>
-        <div className="grid grid-cols-5 gap-2 rounded-3xl border border-zinc-200 bg-zinc-50 p-4">
-          {Array.from({ length: 10 }, (_, index) => index + 1).map((size) => (
-            <label
-              key={size}
-              className="flex items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white px-3 py-3 text-sm font-medium text-zinc-700"
-            >
-              <input
-                type="checkbox"
-                value={size}
-                {...register("availableSizes", { valueAsNumber: true })}
-                className="h-4 w-4"
-              />
-              {size}
-            </label>
-          ))}
-        </div>
+        <Controller
+          name="availableSizes"
+          control={control}
+          render={({ field }) => {
+            const selected: number[] = Array.isArray(field.value) ? field.value : normalizeSizeList(undefined);
+            const toggle = (size: number) => {
+              const has = selected.includes(size);
+              const next = has
+                ? selected.filter((s) => s !== size)
+                : [...selected, size].sort((a, b) => a - b);
+              field.onChange(next);
+            };
+            return (
+              <div className="grid grid-cols-5 gap-2 rounded-3xl border border-zinc-200 bg-zinc-50 p-4">
+                {Array.from({ length: 10 }, (_, index) => index + 1).map((size) => (
+                  <label
+                    key={size}
+                    className="flex items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white px-3 py-3 text-sm font-medium text-zinc-700"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(size)}
+                      onChange={() => toggle(size)}
+                      onBlur={field.onBlur}
+                      className="h-4 w-4"
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            );
+          }}
+        />
         {errors.availableSizes && (
           <p className="mt-2 text-sm text-red-600">{errors.availableSizes.message}</p>
         )}

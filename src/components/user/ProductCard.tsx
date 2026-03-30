@@ -65,38 +65,44 @@ export const ProductCard = ({ product }: Props) => {
           </div>
         </div>
       </div>
-      <div className="space-y-4 p-5">
+      <div className="space-y-5 p-5">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold tracking-tight text-zinc-950">{product.name}</h3>
           <p className="text-sm leading-6 text-zinc-600">{product.description}</p>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">Price</p>
-            <p className="font-semibold text-zinc-900">{formatCurrencyNPR(product.price)}</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-400">Price</p>
+            <p className="mt-2 text-sm font-semibold leading-5 text-zinc-900">
+              {formatCurrencyNPR(product.price)}
+            </p>
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">Sizes</p>
-            <p className="font-semibold text-zinc-900">{product.availableSizes.join(", ")}</p>
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-400">Sizes</p>
+            <p className="mt-2 text-sm font-semibold leading-5 text-zinc-900">
+              {product.availableSizes.join(", ")}
+            </p>
           </div>
-          <div>
-            <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">In stock</p>
-            <p className="font-semibold text-zinc-900">{product.stock} items</p>
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-400">In stock</p>
+            <p className="mt-2 text-sm font-semibold leading-5 text-zinc-900">
+              {product.stock} items
+            </p>
           </div>
-          <div className="flex gap-2">
-            <Link
-              href={`/product/${product.id}`}
-              className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
-            >
-              View
-            </Link>
-            <button
-              onClick={handleAdd}
-              className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800"
-            >
-              Add
-            </button>
-          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/product/${product.id}`}
+            className="flex-1 rounded-full border border-zinc-200 px-4 py-2 text-center text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+          >
+            View
+          </Link>
+          <button
+            onClick={handleAdd}
+            className="flex-1 rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800"
+          >
+            Add
+          </button>
         </div>
       </div>
     </article>
