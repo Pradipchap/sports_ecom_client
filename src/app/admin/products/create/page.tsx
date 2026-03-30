@@ -14,6 +14,7 @@ type ProductInput = {
   price: number;
   image: string;
   stock: number;
+  availableSizes: number[];
   categoryId: string;
 };
 
@@ -37,6 +38,7 @@ export default function AdminCreateProductPage() {
       formData.append("description", values.description);
       formData.append("price", String(values.price));
       formData.append("stock", String(values.stock));
+      formData.append("availableSizes", JSON.stringify(values.availableSizes));
       formData.append("categoryId", values.categoryId);
 
       if (values.image) {

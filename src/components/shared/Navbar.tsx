@@ -31,10 +31,16 @@ export const Navbar = () => {
           <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-950 text-sm font-bold text-white shadow-lg shadow-zinc-950/20">
             SH
           </span>
-          <span className="text-lg font-bold tracking-tight text-zinc-950">ShoesHub</span>
+          <span className="text-lg font-bold tracking-tight text-zinc-950">SportsHub</span>
         </Link>
 
         <nav className="flex items-center gap-3 text-sm">
+          <Link
+            href="/shop"
+            className="rounded-full border border-zinc-200 bg-white px-4 py-2 font-medium text-zinc-700 transition hover:bg-zinc-50"
+          >
+            Shop
+          </Link>
           <Link
             href="/cart"
             className="rounded-full border border-zinc-200 bg-white px-4 py-2 font-medium text-zinc-700 transition hover:bg-zinc-50"

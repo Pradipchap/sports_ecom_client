@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { resolveImageUrl } from "@/lib/api";
+import { formatCurrencyNPR } from "@/lib/format";
 import { Product } from "@/types";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
@@ -19,14 +20,21 @@ export const ProductCard = ({ product }: Props) => {
   const addToCart = useCartStore((state) => state.addToCart);
 
   const handleAdd = async () => {
+    const defaultSize = product.availableSizes[0];
+
     if (!user) {
       router.push("/login");
       return;
     }
 
+    if (!defaultSize) {
+      toast.error("No sizes available for this product");
+      return;
+    }
+
     try {
-      await addToCart(product.id, 1);
-      toast.success("Added to cart");
+      await addToCart(product.id, defaultSize, 1);
+      toast.success(`Added size ${defaultSize} to cart`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to add");
     }
@@ -47,7 +55,7 @@ export const ProductCard = ({ product }: Props) => {
             {product.category?.name ?? "Featured"}
           </span>
           <span className="rounded-full bg-zinc-950 px-3 py-1 text-xs font-medium text-white">
-            ${product.price.toFixed(0)}
+            {formatCurrencyNPR(product.price)}
           </span>
         </div>
       </div>
@@ -58,8 +66,12 @@ export const ProductCard = ({ product }: Props) => {
         </div>
         <div className="flex items-center justify-between">
           <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">Sizes</p>
+            <p className="font-semibold text-zinc-900">{product.availableSizes.join(", ")}</p>
+          </div>
+          <div>
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-400">In stock</p>
-            <p className="font-semibold text-zinc-900">{product.stock} pairs</p>
+            <p className="font-semibold text-zinc-900">{product.stock} items</p>
           </div>
           <div className="flex gap-2">
             <Link

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shoes Ecommerce",
-  description: "Full-stack ecommerce app for shoes",
+  title: "SportsHub Ecommerce",
+  description: "Full-stack ecommerce app for sports gear and active essentials",
 };
 
 export default function RootLayout({

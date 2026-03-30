@@ -14,6 +14,7 @@ type ProductInput = {
   price: number;
   image: string;
   stock: number;
+  availableSizes: number[];
   categoryId: string;
 };
 
@@ -50,6 +51,7 @@ export default function AdminEditProductPage() {
       formData.append("description", values.description);
       formData.append("price", String(values.price));
       formData.append("stock", String(values.stock));
+      formData.append("availableSizes", JSON.stringify(values.availableSizes));
       formData.append("categoryId", values.categoryId);
 
       if (values.image) {
@@ -86,6 +88,7 @@ export default function AdminEditProductPage() {
             price: product.price,
             image: product.image,
             stock: product.stock,
+            availableSizes: product.availableSizes,
             categoryId: product.categoryId,
           }}
         />

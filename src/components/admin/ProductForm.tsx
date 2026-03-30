@@ -13,6 +13,7 @@ const schema = z.object({
   price: z.number().positive(),
   image: z.string().url().or(z.literal("")),
   stock: z.number().int().nonnegative(),
+  availableSizes: z.array(z.number().int().min(1).max(10)).min(1, "Select at least one size"),
   categoryId: z.string().min(1),
 });
 
@@ -41,6 +42,7 @@ export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }
       price: defaultValues?.price ?? 0,
       image: defaultValues?.image ?? "",
       stock: defaultValues?.stock ?? 0,
+      availableSizes: defaultValues?.availableSizes ?? [6, 7, 8, 9],
       categoryId: defaultValues?.categoryId ?? "",
     },
   });
@@ -90,10 +92,10 @@ export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-700">Price</label>
+          <label className="mb-1 block text-sm font-medium text-zinc-700">Price (NPR)</label>
           <input
             type="number"
-            step="0.01"
+            step="1"
             {...register("price", { valueAsNumber: true })}
             className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-zinc-400"
           />
@@ -131,7 +133,7 @@ export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }
             <label className="mb-1 block text-sm font-medium text-zinc-700">Image URL fallback</label>
             <input
               {...register("image")}
-              placeholder="https://example.com/shoe.jpg"
+              placeholder="https://example.com/product-image.jpg"
               className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-zinc-400"
             />
           </div>
@@ -148,6 +150,28 @@ export const ProductForm = ({ defaultValues, categories, onSubmit, submitLabel }
             </div>
           )}
         </div>
+      </div>
+      <div>
+        <label className="mb-2 block text-sm font-medium text-zinc-700">Available sizes</label>
+        <div className="grid grid-cols-5 gap-2 rounded-3xl border border-zinc-200 bg-zinc-50 p-4">
+          {Array.from({ length: 10 }, (_, index) => index + 1).map((size) => (
+            <label
+              key={size}
+              className="flex items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white px-3 py-3 text-sm font-medium text-zinc-700"
+            >
+              <input
+                type="checkbox"
+                value={size}
+                {...register("availableSizes", { valueAsNumber: true })}
+                className="h-4 w-4"
+              />
+              {size}
+            </label>
+          ))}
+        </div>
+        {errors.availableSizes && (
+          <p className="mt-2 text-sm text-red-600">{errors.availableSizes.message}</p>
+        )}
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-zinc-700">Category</label>

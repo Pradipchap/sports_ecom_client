@@ -35,10 +35,10 @@ export default function Home() {
           </span>
           <div className="space-y-3">
             <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-zinc-950 md:text-5xl">
-              Elevated sneakers and timeless silhouettes for every day.
+              Premium sports gear and active essentials for every game day.
             </h1>
             <p className="max-w-xl text-base leading-7 text-zinc-600">
-              Discover premium comfort, clean design, and modern classics curated for the way you move.
+              Discover performance-focused apparel, footwear, and equipment curated for training, competition, and recovery.
             </p>
           </div>
           <div className="flex flex-col gap-3 md:flex-row">
@@ -58,12 +58,12 @@ export default function Home() {
           <p className="text-sm uppercase tracking-[0.28em] text-white/70">Curated selection</p>
           <div className="mt-8 space-y-4">
             <div className="rounded-3xl bg-white/10 p-4 backdrop-blur">
-              <p className="text-sm text-white/70">Signature comfort</p>
-              <p className="mt-1 text-2xl font-semibold">Engineered for all-day wear</p>
+              <p className="text-sm text-white/70">Performance ready</p>
+              <p className="mt-1 text-2xl font-semibold">Built for training, play, and recovery</p>
             </div>
             <div className="rounded-3xl bg-white/10 p-4 backdrop-blur">
-              <p className="text-sm text-white/70">Minimal aesthetic</p>
-              <p className="mt-1 text-2xl font-semibold">Modern looks with premium details</p>
+              <p className="text-sm text-white/70">Sport-first selection</p>
+              <p className="mt-1 text-2xl font-semibold">Essentials across footwear, apparel, and gear</p>
             </div>
           </div>
         </div>
@@ -72,8 +72,8 @@ export default function Home() {
       <div className="space-y-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.24em] text-zinc-400">Shop by style</p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight text-zinc-950">Featured collections</h2>
+            <p className="text-sm uppercase tracking-[0.24em] text-zinc-400">Shop by category</p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-zinc-950">Featured sports collections</h2>
           </div>
           <CategoryFilter
             categories={categories}

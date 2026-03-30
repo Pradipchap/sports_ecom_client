@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatCurrencyNPR } from "@/lib/format";
 import { Product } from "@/types";
 
 type Props = {
@@ -21,6 +22,7 @@ export const ProductTable = ({ products, onDelete }: Props) => {
             <th className="px-4 py-4">Name</th>
             <th className="px-4 py-4">Category</th>
             <th className="px-4 py-4">Price</th>
+            <th className="px-4 py-4">Sizes</th>
             <th className="px-4 py-4">Stock</th>
             <th className="px-4 py-4">Actions</th>
           </tr>
@@ -30,7 +32,8 @@ export const ProductTable = ({ products, onDelete }: Props) => {
             <tr key={product.id} className="border-b border-zinc-100 text-sm last:border-b-0">
               <td className="px-4 py-4 font-medium text-zinc-900">{product.name}</td>
               <td className="px-4 py-4 text-zinc-600">{product.category?.name ?? "N/A"}</td>
-              <td className="px-4 py-4 font-medium text-zinc-900">${product.price.toFixed(2)}</td>
+              <td className="px-4 py-4 font-medium text-zinc-900">{formatCurrencyNPR(product.price)}</td>
+              <td className="px-4 py-4 text-zinc-600">{product.availableSizes.join(", ")}</td>
               <td className="px-4 py-4 text-zinc-600">{product.stock}</td>
               <td className="flex gap-2 px-4 py-4">
                 <Link

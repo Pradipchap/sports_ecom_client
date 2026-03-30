@@ -8,9 +8,9 @@ type CartState = {
   cart: Cart | null;
   loading: boolean;
   fetchCart: () => Promise<void>;
-  addToCart: (productId: string, quantity?: number) => Promise<void>;
-  updateCartItem: (productId: string, quantity: number) => Promise<void>;
-  removeCartItem: (productId: string) => Promise<void>;
+  addToCart: (productId: string, size: number, quantity?: number) => Promise<void>;
+  updateCartItem: (productId: string, size: number, quantity: number) => Promise<void>;
+  removeCartItem: (productId: string, size: number) => Promise<void>;
 };
 
 export const useCartStore = create<CartState>((set) => ({
@@ -27,26 +27,26 @@ export const useCartStore = create<CartState>((set) => ({
     }
   },
 
-  async addToCart(productId, quantity = 1) {
+  async addToCart(productId, size, quantity = 1) {
     const data = await apiRequest<{ cart: Cart }>("/cart/add", {
       method: "POST",
-      body: { productId, quantity },
+      body: { productId, size, quantity },
     });
     set({ cart: data.cart });
   },
 
-  async updateCartItem(productId, quantity) {
+  async updateCartItem(productId, size, quantity) {
     const data = await apiRequest<{ cart: Cart }>("/cart/update", {
       method: "PUT",
-      body: { productId, quantity },
+      body: { productId, size, quantity },
     });
     set({ cart: data.cart });
   },
 
-  async removeCartItem(productId) {
+  async removeCartItem(productId, size) {
     const data = await apiRequest<{ cart: Cart }>("/cart/remove", {
       method: "DELETE",
-      body: { productId },
+      body: { productId, size },
     });
     set({ cart: data.cart });
   },

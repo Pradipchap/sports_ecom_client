@@ -20,6 +20,7 @@ export type Product = {
   price: number;
   image: string;
   stock: number;
+  availableSizes: number[];
   categoryId: string;
   createdAt: string;
   category?: Category;
@@ -29,6 +30,7 @@ export type CartItem = {
   id: string;
   cartId: string;
   productId: string;
+  size: number;
   quantity: number;
   product: Product;
 };

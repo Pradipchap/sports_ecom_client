@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { resolveImageUrl } from "@/lib/api";
+import { formatCurrencyNPR } from "@/lib/format";
 import { CartItem as CartItemType } from "@/types";
 
 type Props = {
@@ -24,8 +25,13 @@ export const CartItem = ({ item, onUpdateQuantity, onRemove }: Props) => {
       </div>
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-zinc-950">{item.product.name}</h3>
-        <p className="mt-1 text-sm text-zinc-500">{item.product.category?.name ?? "Premium shoe"}</p>
-        <p className="mt-2 text-sm font-semibold text-zinc-800">${item.product.price.toFixed(2)}</p>
+        <p className="mt-1 text-sm text-zinc-500">{item.product.category?.name ?? "Premium sports item"}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          <p className="text-sm font-semibold text-zinc-800">{formatCurrencyNPR(item.product.price)}</p>
+          <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
+            Size {item.size}
+          </span>
+        </div>
       </div>
       <div className="flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-1">
         <button
